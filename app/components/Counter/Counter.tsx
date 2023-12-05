@@ -4,13 +4,44 @@
 import { useState } from "react";
 
 /* Instruments */
-import { useSelector, selectCount } from "@/lib/redux";
+import { useSelector, selectCount, counterAction, fetchUserById } from "@/lib/redux";
+import { decreament, increment, incrementByCount, incrementIfOdd } from "@/lib/redux/rootReducer";
+import { useDispatch } from "react-redux";
 import styles from "./counter.module.css";
+
 
 export const Counter = () => {
   const count = useSelector(selectCount);
+  const dispatch = useDispatch();
+  const [incrementAmount, setIncrementAmount] = useState<number>(0)
+
+  const updateCounter = (action: string) => {
+    switch (action) {
+      case counterAction.DECREMENT:
+        dispatch(decreament());
+        break;
+      case counterAction.INCREMENT:
+        dispatch(increment());
+        break;
+      case counterAction.INCREMENT_BY_COUNT:
+        dispatch(incrementByCount(incrementAmount));
+        break;
+      case counterAction.INCREMENT_IF_ODD:
+        dispatch(incrementIfOdd(incrementAmount))
+        break;
+      default:
+        break;
+    }
+  };
 
   // Create a state named incrementAmount
+  const setCounterInputValue = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const inputVal = parseInt(event.target.value);
+    if (inputVal) {
+      setIncrementAmount(inputVal)
+    }
+  }
+
 
   return (
     <div>
@@ -18,9 +49,7 @@ export const Counter = () => {
         <button
           className={styles.button}
           aria-label="Decrement value"
-          onClick={() => {
-            // dispatch event to decrease count by 1
-          }}
+          onClick={updateCounter.bind(null, counterAction.DECREMENT)}
         >
           -
         </button>
@@ -28,28 +57,22 @@ export const Counter = () => {
         <button
           className={styles.button}
           aria-label="Increment value"
-          onClick={() => {
-            // dispatch event to increment count by 1
-          }}
+          onClick={updateCounter.bind(null, counterAction.INCREMENT)}
         >
           +
         </button>
       </div>
       <div className={styles.row}>
-        <input className={styles.textbox} aria-label="Set increment amount" />
+        <input className={styles.textbox} value={incrementAmount} onChange={setCounterInputValue} aria-label="Set increment amount" />
         <button
           className={styles.button}
-          onClick={() => {
-            // dispatch event to add incrementAmount to count
-          }}
+          onClick={updateCounter.bind(null, counterAction.INCREMENT_BY_COUNT)}
         >
           Add Amount
         </button>
         <button
           className={styles.button}
-          onClick={() => {
-            // dispatch event to add incrementAmount only if count is odd
-          }}
+          onClick={updateCounter.bind(null, counterAction.INCREMENT_IF_ODD)}
         >
           Add If Odd
         </button>
